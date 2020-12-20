@@ -1,0 +1,27 @@
+" Highlight search results
+set hlsearch
+
+" Incrementally search while typing
+set incsearch
+
+" Map space to leader key
+let mapleader = " "
+
+" Go to symbol declaration
+nnoremap <leader>gd :action GotoDeclaration<CR>
+
+" Go to interface implementation
+nnoremap <leader>gi :action GotoImplementation<CR>
+
+" Go to right split window
+nnoremap <C-l> <C-w>l
+
+" Go to left split window
+nnoremap <C-h> <C-w>h
+
+" always keep 10 lines above and below the cursor
+set scrolloff=10
+
+" turn off IdeaVim's annoying bells
+set noerrorbells
+set visualbell
