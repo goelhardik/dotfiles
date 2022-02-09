@@ -75,7 +75,7 @@ $GitPromptSettings.WorkingColor.ForegroundColor = 0xFCE94F
 # Prompt shape
 
 $GitPromptSettings.AfterStatus.Text = " "
-$GitPromptSettings.BeforeStatus.Text = "  "
+$GitPromptSettings.BeforeStatus.Text = " "
 $GitPromptSettings.BranchAheadStatusSymbol.Text = ""
 $GitPromptSettings.BranchBehindStatusSymbol.Text = ""
 $GitPromptSettings.BranchGoneStatusSymbol.Text = ""
@@ -89,6 +89,8 @@ $GitPromptSettings.LocalWorkingStatusSymbol.Text = ""
 $GitPromptSettings.EnableStashStatus = $false
 $GitPromptSettings.ShowStatusWhenZero = $false
 
+#$GitPromptSettings.DefaultPromptPrefix.Text = ""
+$GitPromptSettings.PathStatusSeparator.Text=""
 ###################################################################################
 
 ####### ALIASES
@@ -128,6 +130,11 @@ Function onecsv1_job {c:\Windows\System32\tasklist.exe /FI "SERVICES eq Complian
 
 Set-Alias -Name csv1web -Value onecsv1_w3p
 Set-Alias -Name csv1job -Value onecsv1_job
+
+#ilspy
+Function ilspy {E:\scripts\ILSpy-win-x64-Release\ILSpy}
+
+Function stern {E:\scripts\stern_windows_amd64.exe}
 
 ###################################################################################
 
@@ -229,13 +236,13 @@ set-content Function:prompt {
 
     # Write ERR for any PowerShell errors
     if ($Error.Count -ne 0) {
-        Write-Host " $([char]27)[38;5;227;48;5;131m  ERR $([char]27)[0m" -NoNewLine
+        Write-Host "$([char]27)[38;5;131m$([char]27)[38;5;227;48;5;131m  ERR $([char]27)[0m$([char]27)[38;5;131m$([char]27)[0m" -NoNewLine
         $Error.Clear()
     }
 
     # Write non-zero exit code from last launched process
     if ($LASTEXITCODE -ne "") {
-        Write-Host " $([char]27)[38;5;227;48;5;131m  $LASTEXITCODE $([char]27)[0m" -NoNewLine
+        Write-Host "$([char]27)[38;5;131m$([char]27)[38;5;227;48;5;131m  $LASTEXITCODE $([char]27)[0m$([char]27)[38;5;131m$([char]27)[0m" -NoNewLine
         $LASTEXITCODE = ""
     }
 
@@ -259,7 +266,7 @@ set-content Function:prompt {
 	# Write the current kubectl context
 	$K8sContext=$(Get-Content ~/.kube/config | Select-String -Pattern "^current-context: (.*)$" | ForEach-Object { $_.Matches[0].Groups[1].Value})
 	if ($K8sContext) {
-		Write-Host " $([char]27)[38;5;112;48;5;242m  $([char]27)[38;5;254m$K8sContext $([char]27)[0m" -NoNewLine
+		Write-Host "$([char]27)[38;5;242m$([char]27)[38;5;112;48;5;242m  $([char]27)[38;5;254m$K8sContext $([char]27)[0m$([char]27)[38;5;242m$([char]27)[0m" -NoNewLine
     }
 
     # Write the current public cloud Azure CLI subscription
@@ -272,7 +279,7 @@ set-content Function:prompt {
             if ($null -ne $currentSub) {
                 $currentAccount = (Get-Content ~/.azure/azureProfile.json | ConvertFrom-Json).subscriptions | Where-Object { $_.id -eq $currentSub }
                 if ($null -ne $currentAccount) {
-                    Write-Host " $([char]27)[38;5;227;48;5;30m  $([char]27)[38;5;254m$($currentAccount.name) $([char]27)[0m" -NoNewLine
+                    Write-Host "$([char]27)[38;5;30m$([char]27)[38;5;227;48;5;30m  $([char]27)[38;5;254m$($currentAccount.name) $([char]27)[0m$([char]27)[38;5;30m$([char]27)[0m" -NoNewLine
                 }
             }
         }
@@ -281,7 +288,7 @@ set-content Function:prompt {
     # Write the current Git information
     if ($null -ne (Get-Command "Get-GitDirectory" -ErrorAction Ignore)) {
         if (Get-GitDirectory -ne $null) {
-            Write-Host (Write-VcsStatus) -NoNewLine
+            Write-Host "$([char]27)[38;2;52;101;164m█$(Write-VcsStatus)$([char]27)[38;2;52;101;164m" -NoNewLine
         }
     }
 
@@ -290,7 +297,15 @@ set-content Function:prompt {
     $idx = $currentPath.IndexOf("::")
     if ($idx -gt -1) { $currentPath = $currentPath.Substring($idx + 2) }
 
-    Write-Host " $([char]27)[38;5;227;48;5;28m  $([char]27)[38;5;254m$currentPath $([char]27)[0m " -NoNewline
+    Write-Host "$([char]27)[38;5;28m█$([char]27)[38;5;227;48;5;28m $([char]27)[38;5;254m$currentPath $([char]27)[0m$([char]27)[38;5;28m$([char]27)[0m" -NoNewline
+
+    # Write the current path as the terminal title
+    $gitDir = git rev-parse --show-toplevel 2>$null
+    if ($null -ne $gitDir) {
+        $Host.UI.RawUI.WindowTitle = $gitDir
+    } else {
+        $Host.UI.RawUI.WindowTitle = $currentPath
+    }
 
     # Reset LASTEXITCODE so we don't show it over and over again
     $global:LASTEXITCODE = 0
