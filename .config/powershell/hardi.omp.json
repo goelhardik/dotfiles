@@ -28,17 +28,9 @@
                     "powerline_symbol": "",
                     "foreground": "#f8f8f8",
                     "background": "#5065ef",
-                    "template": " \uFD31 {{.Context}}{{if .Namespace}} :: {{.Namespace}}{{end}}"
-                },
-                {
-                    "type": "command",
-                    "style": "powerline",
-                    "powerline_symbol": "",
-                    "foreground": "#FFFB38",
-                    "background": "#ef5350",
+                    "template": " \uFD31 {{.Context}}{{ if .Namespace }} :: {{ .Namespace }}{{ end }}",
                     "properties": {
-                        "shell": "pwsh",
-                        "command": "if (Test-Path Env:CoreXTBuild) { 'skyrise' } Else { '' }"
+                        "parse_kubeconfig": true
                     }
                 },
                 {
@@ -74,7 +66,7 @@
                         "{{ if gt .Ahead 0 }}#C792EA{{ end }}",
                         "{{ if gt .Behind 0 }}#C792EA{{ end }}"
                     ],
-                    "template": " {{ .HEAD }} {{ if .Working.Changed }}{{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}<#ef5350>  {{ .Staging.String }}</>{{ end }} ",
+                    "template": " {{ .HEAD }} {{ if .Working.Changed }}{{ .Working.String }}{{ end }} {{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}<#ef5350>  {{ .Staging.String }}</>{{ end }} ",
                     "properties": {
                         "branch_icon": " ",
                         "fetch_status": true,
